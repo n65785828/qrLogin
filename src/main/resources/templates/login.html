@@ -35,6 +35,16 @@
       }
     };
 
+    source.onerror= function (ev){
+      console.log("come in")
+      console.log(ev);
+    }
+
+    source.addEventListener("COMPLETE", function(evt) {
+      console.log(evt);
+      source.close();
+    });
+
     source.onopen = function (evt) {
       console.log("开始订阅");
     }

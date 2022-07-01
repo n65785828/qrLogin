@@ -30,6 +30,8 @@ public class QrLoginRest {
     @Value(("${server.port}"))
     private int port;
 
+    private Map<String, SseEmitter> cache = new ConcurrentHashMap<>();
+
     @GetMapping(path = "login")
     public String qr(Map<String, Object> data) throws IOException, WriterException {
         String id = UUID.randomUUID().toString();
@@ -42,15 +44,12 @@ public class QrLoginRest {
 
 
         String qrUrl = pref + "scan?id=" + id;
-        // 下面这一行生成一张宽高200，红色，圆点的二维码，并base64编码
-        // 一行完成，就这么简单省事，强烈安利
+        // 下面这一行生成一张宽高200，黑色，圆点的二维码，并base64编码
         String qrCode = QrCodeGenWrapper.of(qrUrl).setW(200).setDrawPreColor(Color.BLACK)
                 .setDrawStyle(QrCodeOptions.DrawStyle.CIRCLE).asString();
         data.put("qrcode", DomUtil.toDomSrc(qrCode, MediaType.ImageJpg));
         return "login";
     }
-
-    private Map<String, SseEmitter> cache = new ConcurrentHashMap<>();
 
     @GetMapping(path = "subscribe", produces = {org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE})
     public SseEmitter subscribe(String id) {
